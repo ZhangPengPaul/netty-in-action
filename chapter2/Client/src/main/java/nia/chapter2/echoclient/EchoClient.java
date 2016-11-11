@@ -26,34 +26,33 @@ public class EchoClient {
     }
 
     public static void main(String[] args)
-        throws Exception {
-        if (args.length != 2) {
-            System.err.println("Usage: " + EchoClient.class.getSimpleName() +
-                " <host> <port>"
-            );
-            return;
+            throws Exception {
+        String host = "localhost";
+        int port = 8881;
+        if (args.length == 2) {
+            host = args[0];
+            port = Integer.parseInt(args[1]);
         }
 
-        final String host = args[0];
-        final int port = Integer.parseInt(args[1]);
+
         new EchoClient(host, port).start();
     }
 
     public void start()
-        throws Exception {
+            throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
-                .channel(NioSocketChannel.class)
-                .remoteAddress(new InetSocketAddress(host, port))
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch)
-                        throws Exception {
-                        ch.pipeline().addLast(new EchoClientHandler());
-                    }
-                });
+                    .channel(NioSocketChannel.class)
+                    .remoteAddress(new InetSocketAddress(host, port))
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch)
+                                throws Exception {
+                            ch.pipeline().addLast(new EchoClientHandler());
+                        }
+                    });
 
             ChannelFuture f = b.connect().sync();
             f.channel().closeFuture().sync();
